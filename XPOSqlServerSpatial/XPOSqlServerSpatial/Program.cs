@@ -76,8 +76,17 @@ namespace XPOSqlServerSpatial
 
             // this mechanism persists the srid to SQL Server - 
             // better than using WKT because it doesn't contain srid at all
-            var sqlg = ((SqlGeography)value);
-            return sqlg.Serialize();
+            var sqlGeography = value as SqlGeography;
+            if (sqlGeography != null)
+                return sqlGeography.Serialize();
+            else
+            {
+                var sqlGeometry = value as SqlGeometry;
+                if (sqlGeometry != null)
+                    return sqlGeometry.Serialize();
+                else
+                    return value;
+            }
         }
 
         public override Type StorageType
