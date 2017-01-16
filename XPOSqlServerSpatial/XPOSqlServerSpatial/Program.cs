@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace XPOSqlServerSpatial
@@ -22,12 +24,15 @@ namespace XPOSqlServerSpatial
 
         protected override object ReformatReadValue(object value, ReformatReadValueArgs args)
         {
+            // This implementation deactivates the default behavior of the base 
+            // class logic, because the conversion step is not necessary for the types
+            // SqlGeography and SqlGeometry, and because the attempt at conversion
+            // results in exceptions since there is no automatic conversion mechanism.
             if (value != null)
             {
                 Type valueType = value.GetType();
                 if (valueType == typeof(SqlGeography) || valueType == typeof(SqlGeometry))
-                    return value.ToString();
-                //return value;
+                    return value;
             }
             return base.ReformatReadValue(value, args);
         }
@@ -59,14 +64,20 @@ namespace XPOSqlServerSpatial
     {
         public override object ConvertFromStorageType(object value)
         {
-            if (value is string)
-                return SqlGeography.Parse((string)value);
-            else return value;
+            // We're ignoring the request to convert here, knowing that the loaded
+            // object is already the correct type because SqlClient returns it 
+            // that way.
+            return value;
         }
 
         public override object ConvertToStorageType(object value)
         {
-            return value == null ? null : ((SqlGeography)value).ToString();
+            if (value == null) return null;
+
+            // this mechanism persists the srid to SQL Server - 
+            // better than using WKT because it doesn't contain srid at all
+            var sqlg = ((SqlGeography)value);
+            return sqlg.Serialize();
         }
 
         public override Type StorageType
@@ -81,7 +92,9 @@ namespace XPOSqlServerSpatial
         private static SqlGeography CreatePolygon()
         {
             SqlGeographyBuilder builder = new SqlGeographyBuilder();
-            builder.SetSrid(4326);
+            // Explicitly using a different SRID here to check serialization
+            //            builder.SetSrid(4326);
+            builder.SetSrid(4322);
             builder.BeginGeography(OpenGisGeographyType.Polygon);
             builder.BeginFigure(55.36728, -2.74941);
             builder.AddLine(55.40002, -2.68289);
@@ -98,12 +111,12 @@ namespace XPOSqlServerSpatial
             SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
 
             XpoDefault.DataLayer =
-  new SimpleDataLayer(new GISProvider(
-      // need Type System Version here because SqlClient will otherwise blindly try to load 
-      // version 10.0.0.0 of Microsoft.SqlServer.Types regardless of project references
-      new SqlConnection("data source=.\\SQLEXPRESS;integrated security=SSPI;Type System Version=SQL Server 2012;initial catalog=XPOSql2008Spatial"),
-//    new SqlConnection("data source=.\\SQLEXPRESS;integrated security=SSPI;initial catalog=XPOSql2008Spatial"),
-    AutoCreateOption.DatabaseAndSchema));
+              new SimpleDataLayer(new GISProvider(
+                // need Type System Version here because SqlClient will otherwise blindly try to load 
+                // version 10.0.0.0 of Microsoft.SqlServer.Types regardless of project references
+                  new SqlConnection("data source=.\\SQLEXPRESS;integrated security=SSPI;Type System Version=SQL Server 2012;initial catalog=XPOSql2008Spatial"),
+                //    new SqlConnection("data source=.\\SQLEXPRESS;integrated security=SSPI;initial catalog=XPOSql2008Spatial"),
+                AutoCreateOption.DatabaseAndSchema));
 
             using (UnitOfWork uow = new UnitOfWork())
             {
@@ -126,8 +139,9 @@ namespace XPOSqlServerSpatial
                 var polygons = new XPCollection<PolygonData>();
                 foreach (var polygon in polygons)
                 {
-                    Console.WriteLine(polygon.Name);
-                    Console.WriteLine(polygon.Polygon);
+                    Console.WriteLine("Name: " + polygon.Name);
+                    Console.WriteLine("SRID: " + polygon.Polygon.STSrid);
+                    Console.WriteLine("Polygon: " + polygon.Polygon);
                 }
             }
 
