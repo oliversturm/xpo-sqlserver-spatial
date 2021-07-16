@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPOSqlServerSpatial", "XPOSqlServerSpatial\XPOSqlServerSpatial.csproj", "{4947726F-966E-4E40-9C92-99AC2E704A7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPOSqlServerSpatialNTS", "XPOSqlServerSpatialNTS\XPOSqlServerSpatialNTS.csproj", "{2B49B2A6-3EDB-4F56-841D-7BAC113B2F8E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,11 +14,17 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4947726F-966E-4E40-9C92-99AC2E704A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4947726F-966E-4E40-9C92-99AC2E704A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4947726F-966E-4E40-9C92-99AC2E704A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4947726F-966E-4E40-9C92-99AC2E704A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B49B2A6-3EDB-4F56-841D-7BAC113B2F8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B49B2A6-3EDB-4F56-841D-7BAC113B2F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B49B2A6-3EDB-4F56-841D-7BAC113B2F8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B49B2A6-3EDB-4F56-841D-7BAC113B2F8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E2D1A7E-5C73-4ADE-B34A-867BDD83FC28}
 	EndGlobalSection
 EndGlobal
